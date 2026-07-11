@@ -39,7 +39,7 @@ person's job level or salary a year ago." That's not how real HRIS systems
 
 ---
 
-##Phase 2 — Effective-dated history, 50,000 employees (30K active + 20K alumni)
+## Phase 2 — Effective-dated history, 50,000 employees (30K active + 20K alumni)
 
 Rebuilt the employee model the way a real enterprise HRIS does it —
 position history as dated records, not single current-state rows — and
@@ -94,7 +94,7 @@ produces valid but non-identical data; documented as a known
 reproducibility limitation rather than silently ignored
 
 
-##What's next (Phase 3)
+## What's next (Phase 3)
 
 
 Performance reviews and engagement surveys, rebuilt at 50K scale
