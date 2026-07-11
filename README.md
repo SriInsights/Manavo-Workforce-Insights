@@ -39,49 +39,67 @@ person's job level or salary a year ago." That's not how real HRIS systems
 
 ---
 
-## Phase 2 — Effective-dated history, 30,000 employees *(started 07/08/2026)*
+Phase 2 — Effective-dated history, 50,000 employees (30K active + 20K alumni)
 
-**Goal:** rebuild the employee model the way a real enterprise HRIS does
-it — with position history as dated records, not a single current-state
-row — and learn to handle the performance and data-integrity problems
-that only show up at real scale.
+Rebuilt the employee model the way a real enterprise HRIS does it —
+position history as dated records, not single current-state rows — and
+learned to handle the performance and integrity problems that only show up
+at real scale.
 
-**What I built:**
-- 30,000-employee core table, hire dates weighted to produce a realistic
-  company growth curve (260 hires in 2016 → 5,141 in 2025)
-- Manager hierarchy assigned via grouped lookup by (department, job_level)
-  instead of a full pairwise scan — avoided an ~O(n²) approach that would
-  have been ~56x slower at this scale, not just 7.5x
-- **Effective-dated position history** (50,489 rows): one row per version
-  of an employee's job level and salary, with `effective_start_date` /
-  `effective_end_date`, correctly chained with no gaps or overlaps
-- Promotion velocity that varies by career stage (junior levels promote
-  ~every 3 years, senior levels plateau at ~every 9 years) instead of a
-  flat rule
-- Salary bands per level, with real within-level variation instead of flat
-  midpoints
+Core build:
 
-**Real bugs found and fixed (full detail in BUILD_LOG.md):**
-1. Sorted employees by hire date and reassigned employee_id *after*
-   manager relationships were already built — silently corrupted every
-   manager_id. A naive existence check didn't catch it; a stricter
-   identity check did.
-2. A safety cap on job_level (max 7) applied to the main employee table
-   didn't propagate into a separate position-history generation function,
-   letting invalid "Level 8" rows leak through for 49 employees.
 
-📁 See `/phase2_30k_employees/`
+30,000 active employees, hire dates weighted for a realistic company
+growth curve
+Manager hierarchy via grouped lookup (department + job_level) instead of
+a full pairwise scan — avoided ~56x slowdown vs. a naive O(n²) approach
+Effective-dated position history (86,643 rows): job level, salary,
+and location per position version, correctly chained start/end dates
+Job level derived from starting_level + promotion count (not
+independently randomized), with promotion velocity varying by career
+stage (junior levels ~every 3 years, senior levels ~every 9 years,
+reflecting real plateau patterns)
+Salary assigned per position-history row within level-specific bands,
+with real within-level variation
+20,000 alumni employees across four realistic tenure categories
+(never-started, very-short, short-medium, long-tenure), each with
+termination dates constrained to fall before the snapshot date
+Three-tier termination structure: employment_status (Active/Completed)
+→ disposition (Voluntary/Involuntary/Never Started) → specific
+termination_reason
+Multi-locale realistic names (50,000 people, ~1.2% name-collision rate)
+Department-appropriate job titles (11 departments × 7 levels, following
+real industry progression: numbered junior titles → Senior/Staff/
+Principal → Director/VP)
+Work location, effective-dated alongside position changes
 
----
 
-## What's next
+Real bugs found and fixed (full detail in BUILD_LOG.md):
 
-- Phase 3: bronze/silver/gold pipeline rebuilt at 30K scale, loaded into a
-  real source database, then Fabric OneLake
-- Phase 4: AI-agent query layer (Anthropic API + tool calling) on top of
-  the semantic model
 
-## Build log
+Manager ID corruption from reordering employee_id after manager_id was
+already built — caught only by a strict identity check, not a naive
+existence check
+job_level safety cap not propagating into a separately-calculated
+function — 49 employees leaked "Level 8" until caught
+Hire-date-first alumni generation could produce termination dates in
+the future — fixed by deriving hire_date backward from a constrained
+termination_date instead
+Missing CEO record — position history existed for the CEO, but no
+matching employee record did, a real referential-integrity gap caught
+by testing "does E00000 actually exist" rather than assuming it did
+Duplicate CEO row from re-running a non-idempotent pd.concat cell
+Unseeded randomness — no random.seed() set, meaning re-running cells
+produces valid but non-identical data; documented as a known
+reproducibility limitation rather than silently ignored
 
-`BUILD_LOG.md` — a running, honest account of every design decision and
-bug, written as the project was built, not reconstructed afterward.
+
+What's next (Phase 3)
+
+
+Performance reviews and engagement surveys, rebuilt at 50K scale
+Compensation history independent of promotions (merit/market adjustments)
+FTE %, contract type (permanent/contractor/part-time)
+Bronze/silver/gold pipeline at 50K scale → real source database →
+Fabric OneLake
+AI-agent query layer (Anthropic API + tool calling) on the semantic model
