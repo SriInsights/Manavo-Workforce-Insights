@@ -97,9 +97,9 @@ reproducibility limitation rather than silently ignored
 ## What's next (Phase 3)
 
 
-Performance reviews and engagement surveys, rebuilt at 50K scale
-Compensation history independent of promotions (merit/market adjustments)
-FTE %, contract type (permanent/contractor/part-time)
-Bronze/silver/gold pipeline at 50K scale → real source database →
-Fabric OneLake
-AI-agent query layer (Anthropic API + tool calling) on the semantic model
+- Performance reviews and engagement surveys, rebuilt at 50K scale
+- Compensation history independent of promotions (merit/market adjustments)
+- FTE %, contract type (permanent/contractor/part-time)
+- Bronze/silver/gold pipeline at 50K scale → real source database →
+- Fabric OneLake
+- AI-agent query layer (Anthropic API + tool calling) on the semantic model
