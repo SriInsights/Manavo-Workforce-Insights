@@ -39,36 +39,36 @@ person's job level or salary a year ago." That's not how real HRIS systems
 
 ---
 
-Phase 2 — Effective-dated history, 50,000 employees (30K active + 20K alumni)
+##Phase 2 — Effective-dated history, 50,000 employees (30K active + 20K alumni)
 
 Rebuilt the employee model the way a real enterprise HRIS does it —
 position history as dated records, not single current-state rows — and
 learned to handle the performance and integrity problems that only show up
 at real scale.
 
-Core build:
+**Core build:**
 
 
-30,000 active employees, hire dates weighted for a realistic company
+-30,000 active employees, hire dates weighted for a realistic company
 growth curve
-Manager hierarchy via grouped lookup (department + job_level) instead of
+-Manager hierarchy via grouped lookup (department + job_level) instead of
 a full pairwise scan — avoided ~56x slowdown vs. a naive O(n²) approach
-Effective-dated position history (86,643 rows): job level, salary,
+-Effective-dated position history (86,643 rows): job level, salary,
 and location per position version, correctly chained start/end dates
-Job level derived from starting_level + promotion count (not
+-Job level derived from starting_level + promotion count (not
 independently randomized), with promotion velocity varying by career
 stage (junior levels ~every 3 years, senior levels ~every 9 years,
 reflecting real plateau patterns)
-Salary assigned per position-history row within level-specific bands,
+-Salary assigned per position-history row within level-specific bands,
 with real within-level variation
-20,000 alumni employees across four realistic tenure categories
+-20,000 alumni employees across four realistic tenure categories
 (never-started, very-short, short-medium, long-tenure), each with
 termination dates constrained to fall before the snapshot date
-Three-tier termination structure: employment_status (Active/Completed)
+-Three-tier termination structure: employment_status (Active/Completed)
 → disposition (Voluntary/Involuntary/Never Started) → specific
 termination_reason
-Multi-locale realistic names (50,000 people, ~1.2% name-collision rate)
-Department-appropriate job titles (11 departments × 7 levels, following
+-Multi-locale realistic names (50,000 people, ~1.2% name-collision rate)
+-Department-appropriate job titles (11 departments × 7 levels, following
 real industry progression: numbered junior titles → Senior/Staff/
 Principal → Director/VP)
 Work location, effective-dated alongside position changes
@@ -94,7 +94,7 @@ produces valid but non-identical data; documented as a known
 reproducibility limitation rather than silently ignored
 
 
-What's next (Phase 3)
+##What's next (Phase 3)
 
 
 Performance reviews and engagement surveys, rebuilt at 50K scale
